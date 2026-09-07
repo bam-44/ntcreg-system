@@ -1,0 +1,6 @@
+{
+  "name": "مركز النهضة للتدريب والتطوير الذاتي",
+  "description": "البوابة الإلكترونية الرسمية لمركز النهضة للتدريب والتطوير الذاتي لتسجيل المتدربين وإدارة الدورات التدريبية الشهرية",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

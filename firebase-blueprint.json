@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AlnahdaTrainingCenterBlueprint",
+  "description": "Schema and security blueprint for Al-Nahda Training Center management system",
+  "entities": {
+    "courses": {
+      "description": "Training courses offered by Al-Nahda Training Center",
+      "fields": {
+        "id": { "type": "string", "description": "Unique course ID" },
+        "title": { "type": "string", "description": "Course title" },
+        "category": { "type": "string", "description": "Category name" },
+        "instructor": { "type": "string", "description": "Instructor full name" },
+        "duration": { "type": "string", "description": "Course duration details" },
+        "fee": { "type": "number", "description": "Course fee in SDG" },
+        "seats": { "type": "number", "description": "Total available seats" },
+        "registeredCount": { "type": "number", "description": "Current number of approved/registered trainees" },
+        "status": { "type": "string", "enum": ["active", "closed", "upcoming"], "description": "Course status" },
+        "schedule": { "type": "string", "description": "Schedule days and timings" },
+        "startDate": { "type": "string", "description": "Course start date" },
+        "features": { "type": "array", "items": { "type": "string" }, "description": "Course highlights" },
+        "month": { "type": "string", "description": "Year and month key (e.g. 2026-08)" },
+        "createdAt": { "type": "string", "description": "Timestamp ISO" }
+      }
+    },
+    "registrations": {
+      "description": "Trainee course registration applications",
+      "fields": {
+        "id": { "type": "string", "description": "Registration identifier (e.g. REG-2026-XXXX)" },
+        "courseId": { "type": "string", "description": "Reference course ID" },
+        "courseTitle": { "type": "string", "description": "Title of the course registered for" },
+        "traineeName": { "type": "string", "description": "Full name of the trainee" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "email": { "type": "string", "description": "Email address" },
+        "nationalId": { "type": "string", "description": "National ID or Passport number" },
+        "qualification": { "type": "string", "description": "Educational background or job title" },
+        "notes": { "type": "string", "description": "Additional notes from trainee" },
+        "registeredAt": { "type": "string", "description": "Submission ISO date string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"], "description": "Application review status" },
+        "adminNotes": { "type": "string", "description": "Internal notes from center administration" },
+        "courseMonth": { "type": "string", "description": "Course month key" }
+      }
+    },
+    "settings": {
+      "description": "System configuration and contact details for the center",
+      "fields": {
+        "centerName": { "type": "string" },
+        "centerSubtitle": { "type": "string" },
+        "contactPhone": { "type": "string" },
+        "contactWhatsApp": { "type": "string" },
+        "contactEmail": { "type": "string" },
+        "currentMonth": { "type": "string" },
+        "currentMonthName": { "type": "string" },
+        "adminPin": { "type": "string" },
+        "adminEmail": { "type": "string" },
+        "welcomeNotice": { "type": "string" },
+        "registrationSuccessMsg": { "type": "string" },
+        "logoUrl": { "type": "string" }
+      }
+    }
+  }
+}
