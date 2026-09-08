@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { CheckCircle, Copy, Check, MessageSquare, Printer, ArrowRight, Share2, Calendar, User, Phone, BookOpen, Clock } from 'lucide-react';
+import { CheckCircle, Copy, Check, MessageSquare, Printer, ArrowRight, User, Phone, BookOpen } from 'lucide-react';
 import { TraineeRegistration, Course, SystemSettings } from '../../types';
-import { getArabicMonthLabel } from '../../data/initialData';
 
 interface RegistrationSuccessModalProps {
   registration: TraineeRegistration;
