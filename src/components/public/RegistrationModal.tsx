@@ -161,7 +161,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder=""
+              placeholder="مثال: محمد أحمد علي عثمان"
               className={`w-full px-4 py-3 rounded-xl border text-sm text-slate-900 focus:outline-hidden focus:ring-2 transition-all ${
                 errors.fullName
                   ? 'border-rose-400 focus:ring-rose-200 bg-rose-50/30'
@@ -190,7 +190,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 required
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder=""
+                placeholder="مثال: 09xxxxxxx أو 01xxxxxxx"
                 className={`w-full text-right px-4 py-3 rounded-xl border text-sm text-slate-900 focus:outline-hidden focus:ring-2 transition-all ${
                   errors.phoneNumber
                     ? 'border-rose-400 focus:ring-rose-200 bg-rose-50/30'
@@ -216,7 +216,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 dir="ltr"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder=""
+                placeholder="name@example.com"
                 className="w-full text-left px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#185d89] focus:ring-2 focus:ring-[#185d89]/20 text-sm"
               />
               {errors.email && (
@@ -234,7 +234,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder=""
+                placeholder="مثال: عطبرة، الخرطوم، بورتسودان، بربر..."
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#185d89] focus:ring-2 focus:ring-[#185d89]/20 text-sm"
               />
             </div>
@@ -251,7 +251,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               type="text"
               value={jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
-              placeholder=""
+              placeholder="مثال: مهندس، طالب، موظف، طبيب..."
               className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#185d89] focus:ring-2 focus:ring-[#185d89]/20 text-sm"
             />
           </div>
@@ -267,7 +267,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder=""
+              placeholder="أي استفسار أو ملاحظة خاصة تود مشاركتها مع إدارة الدورة..."
               className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-[#185d89] focus:ring-2 focus:ring-[#185d89]/20 text-sm resize-none"
             />
           </div>

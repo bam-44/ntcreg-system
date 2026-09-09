@@ -22,18 +22,17 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const clean = query.trim().toLowerCase().replace(/[\s-]/g, '');
+    // Normalize Arabic/Persian digits to standard Latin digits and strip formatting
+    const normalizeDigits = (str: string) =>
+      str.replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d).toString());
+
+    const clean = normalizeDigits(query).trim().replace(/[\s-+]/g, '');
     if (!clean) return;
 
+    // Search strictly by phone number
     const found = registrations.filter((r) => {
-      const phoneClean = r.phoneNumber.replace(/[\s-]/g, '');
-      const idClean = r.id.toLowerCase().replace(/[\s-]/g, '');
-      const nameClean = r.fullName.toLowerCase();
-      return (
-        phoneClean.includes(clean) ||
-        idClean.includes(clean) ||
-        nameClean.includes(query.trim().toLowerCase())
-      );
+      const phoneClean = normalizeDigits(r.phoneNumber).replace(/[\s-+]/g, '');
+      return phoneClean.includes(clean);
     });
 
     setResults(found);
@@ -97,10 +96,10 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
           <form onSubmit={handleSearch} className="flex gap-2">
             <input
               id="input-query-status"
-              type="text"
+              type="tel"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder=""
+              placeholder="أدخل رقم هاتفك المسجل (مثال: 09xxxxxxx)..."
               className="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:border-[#185d89] focus:ring-2 focus:ring-[#185d89]/20 text-sm"
             />
             <button
@@ -154,7 +153,7 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
               <div className="text-center py-8 text-slate-500">
                 <AlertCircle className="w-10 h-10 text-slate-300 mx-auto mb-2" />
                 <p className="text-sm font-bold text-slate-700">لم يتم العثور على أي تسجيل مطابق</p>
-                <p className="text-xs text-slate-400 mt-1">تأكد من كتابة رقم الهاتف أو الرقم المرجعي بشكل صحيح</p>
+                <p className="text-xs text-slate-400 mt-1">تأكد من كتابة رقم الهاتف المسجل به بشكل صحيح</p>
               </div>
             )
           ) : (

@@ -102,7 +102,7 @@ export const PublicCourseList: React.FC<PublicCourseListProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder=""
+              placeholder="ابحث عن دورة تدريبية..."
               className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 focus:border-[#185d89] focus:ring-2 focus:ring-[#185d89]/20 text-sm"
             />
             <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-3" />

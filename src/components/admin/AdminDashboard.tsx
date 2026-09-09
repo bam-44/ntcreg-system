@@ -94,7 +94,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         type: courseData.type || 'online',
         location: courseData.location || '',
         price: courseData.price ?? 0,
-        currency: courseData.currency || 'ر.س',
+        currency: courseData.currency || 'ج.س',
         instructor: courseData.instructor || { name: 'مدرب معتمد', title: 'خبير تدريب' },
         maxCapacity: courseData.maxCapacity || 30,
         status: courseData.status || 'active',

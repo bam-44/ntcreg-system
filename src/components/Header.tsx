@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { MessageSquare, Calendar, Shield, LogOut } from 'lucide-react';
 import { SystemSettings } from '../types';
 import { Logo } from './Logo';
@@ -25,27 +25,8 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveView,
   onLogout,
 }) => {
-  const clickCountRef = useRef<number>(0);
-  const clickTimerRef = useRef<any>(null);
-
   const handleLogoClick = () => {
     setActiveView('public');
-
-    // Discreet triple-click trigger for admin on touch/mobile devices
-    clickCountRef.current += 1;
-    if (clickCountRef.current === 3) {
-      clickCountRef.current = 0;
-      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
-      if (!isAdmin) {
-        onOpenAdminLogin();
-      }
-      return;
-    }
-
-    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
-    clickTimerRef.current = setTimeout(() => {
-      clickCountRef.current = 0;
-    }, 1200);
   };
 
   return (
