@@ -12,7 +12,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { SystemSettings } from '../../types';
-import { AUTHORIZED_ADMIN_EMAIL } from '../../utils/storage';
+import { AUTHORIZED_ADMIN_EMAIL, getStoredSettings } from '../../utils/storage';
 import { signInWithGoogleAdmin } from '../../services/firestoreService';
 
 interface AdminLoginModalProps {
@@ -111,9 +111,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     // Standard authentication delay for security (prevents timing attacks)
     setTimeout(() => {
       const isEmailValid = cleanEmail === AUTHORIZED_ADMIN_EMAIL.toLowerCase();
-      const isPasswordValid = 
-        cleanPassword === (settings.adminPin || '').trim() || 
-        cleanPassword === 'admin123';
+      
+      // Determine the active PIN (from props or stored settings)
+      const stored = getStoredSettings();
+      const currentPin = (settings?.adminPin || stored?.adminPin || 'admin123').trim();
+      
+      // Password must match the current active PIN strictly (no hardcoded old password fallback)
+      const isPasswordValid = cleanPassword === currentPin;
 
       if (isEmailValid && isPasswordValid) {
         setIsLoading(false);

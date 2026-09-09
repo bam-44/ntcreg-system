@@ -3,7 +3,7 @@ import {
   LayoutDashboard, BookOpen, Users, Calendar, Settings, Plus, 
   CheckCircle, Clock, XCircle, AlertCircle, Trash2, Edit3, 
   ExternalLink, LogOut, ArrowRight, ShieldCheck, Download, RefreshCw, KeyRound, Sparkles,
-  Upload, Image as ImageIcon
+  Upload, Image as ImageIcon, Eye, EyeOff, Lock
 } from 'lucide-react';
 import { Course, TraineeRegistration, SystemSettings, CourseStatus } from '../../types';
 import { TraineeTable } from './TraineeTable';
@@ -49,8 +49,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [contactEmail, setContactEmail] = useState(settings.contactEmail);
   const [welcomeNotice, setWelcomeNotice] = useState(settings.welcomeNotice);
   const [adminPin, setAdminPin] = useState(settings.adminPin);
+  const [showPin, setShowPin] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string>(settings.logoUrl || '');
   const [settingsSuccessMsg, setSettingsSuccessMsg] = useState<string | null>(null);
+
+  // Sync state if settings prop updates from Firestore
+  React.useEffect(() => {
+    setCenterName(settings.centerName);
+    setContactWhatsApp(settings.contactWhatsApp);
+    setContactPhone(settings.contactPhone);
+    setContactEmail(settings.contactEmail);
+    setWelcomeNotice(settings.welcomeNotice);
+    setAdminPin(settings.adminPin);
+    setLogoUrl(settings.logoUrl || '');
+  }, [settings]);
 
   // KPIs
   const totalCoursesCount = courses.length;
@@ -146,6 +158,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Settings Save
   const handleSaveSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanPin = adminPin.trim();
+    if (!cleanPin) {
+      alert('يرجى كتابة كلمة مرور صالحة للمشرف.');
+      return;
+    }
     const updated: SystemSettings = {
       ...settings,
       centerName,
@@ -153,13 +170,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       contactPhone,
       contactEmail,
       welcomeNotice,
-      adminPin: adminPin.trim() || 'admin123',
+      adminPin: cleanPin,
       logoUrl: logoUrl.trim() || undefined,
     };
     onUpdateSettings(updated);
     saveSettings(updated);
-    setSettingsSuccessMsg('تم حفظ الإعدادات والشعار بنجاح!');
-    setTimeout(() => setSettingsSuccessMsg(null), 3000);
+    setSettingsSuccessMsg('تم حفظ كلمة المرور الجديدة وجميع الإعدادات بنجاح! كلمة المرور القديمة أصبحت معطلة نهائياً ولن تقبل بعد الآن.');
+    setTimeout(() => setSettingsSuccessMsg(null), 5000);
   };
 
   // Backup & Restore
@@ -756,18 +773,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span className="text-[10px] text-slate-400">لوحة التحكم مقفلة ومخصصة حصرياً لصاحب هذا الحساب.</span>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  كلمة المرور / الرمز السري لدخول المشرف (Admin PIN)
-                </label>
-                <input
-                  type="text"
-                  dir="ltr"
-                  value={adminPin}
-                  onChange={(e) => setAdminPin(e.target.value)}
-                  placeholder=""
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono text-center tracking-wider font-bold focus:border-[#185d89]"
-                />
+              <div className="bg-amber-50/50 border border-amber-200/80 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block font-black text-slate-800 text-xs flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                    <span>كلمة المرور / الرمز السري لدخول المشرف (Admin PIN)</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPin(!showPin)}
+                    className="text-xs text-slate-500 hover:text-slate-800 font-semibold flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-white/80 transition-colors"
+                  >
+                    {showPin ? (
+                      <>
+                        <EyeOff className="w-3.5 h-3.5" />
+                        <span>إخفاء الرمز</span>
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>إظهار الرمز</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type={showPin ? 'text' : 'password'}
+                    dir="ltr"
+                    value={adminPin}
+                    onChange={(e) => setAdminPin(e.target.value)}
+                    placeholder="اكتبي كلمة المرور الجديدة هنا"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-base font-mono text-center tracking-widest font-black focus:border-[#185d89] focus:ring-2 focus:ring-[#185d89]/10"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+                  🔒 بمجرد الضغط على <strong className="text-emerald-700 font-bold">«حفظ إعدادات النظام»</strong>، سيتم تفعيل كلمة المرور هذه فوراً، وستصبح كلمة المرور القديمة <strong className="text-rose-700 font-bold">معطلة تماماً ولن تقبل أبداً</strong>.
+                </p>
               </div>
 
               <div className="pt-3">
