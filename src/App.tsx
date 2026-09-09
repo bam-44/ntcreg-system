@@ -18,6 +18,7 @@ import {
   subscribeToRegistrations,
   subscribeToSettings,
   saveRegistrationToFirestore,
+  deleteRegistrationFromFirestore,
   syncCoursesWithFirestore,
   syncRegistrationsWithFirestore,
   saveSettingsToFirestore,
@@ -83,8 +84,32 @@ export default function App() {
 
     const unsubRegs = subscribeToRegistrations((firestoreRegs) => {
       if (firestoreRegs) {
-        setRegistrations(firestoreRegs);
-        saveRegistrations(firestoreRegs);
+        // Merge Firestore records with local cached records to prevent accidental data loss
+        const local = getStoredRegistrations();
+        const map = new Map<string, TraineeRegistration>();
+
+        // 1. Populate from local storage
+        local.forEach((r) => map.set(r.id, r));
+
+        // 2. Overwrite with authoritative Firestore records
+        firestoreRegs.forEach((r) => map.set(r.id, r));
+
+        // 3. For any local record not yet in Firestore, back it up to Firestore
+        for (const [id, reg] of map.entries()) {
+          const existsInFirestore = firestoreRegs.some((fr) => fr.id === id);
+          if (!existsInFirestore) {
+            saveRegistrationToFirestore(reg).catch((err) => {
+              console.warn('Auto-sync local registration to Firestore:', err);
+            });
+          }
+        }
+
+        const merged = Array.from(map.values()).sort(
+          (a, b) => new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime()
+        );
+
+        setRegistrations(merged);
+        saveRegistrations(merged);
       }
     });
 
@@ -165,15 +190,17 @@ export default function App() {
     );
 
     if (res.success && res.registration) {
-      // Update local state and cache
+      // 1. Immediately persist to Firebase Firestore to guarantee cloud storage
+      try {
+        await saveRegistrationToFirestore(res.registration);
+      } catch (err) {
+        console.error('Direct Firestore registration save warning:', err);
+      }
+
+      // 2. Update local state and cache
       const updatedList = [res.registration, ...registrations];
       setRegistrations(updatedList);
       saveRegistrations(updatedList);
-
-      // Persist directly to Firebase Firestore
-      saveRegistrationToFirestore(res.registration).catch((err) => {
-        console.warn('Background Firestore registration save note:', err);
-      });
 
       const targetCourse = selectedCourseForRegistration;
       setSelectedCourseForRegistration(null);
@@ -214,6 +241,18 @@ export default function App() {
     }
   };
 
+  // Handler for explicitly deleting a registration
+  const handleDeleteRegistration = async (id: string) => {
+    const updated = registrations.filter((r) => r.id !== id);
+    setRegistrations(updated);
+    saveRegistrations(updated);
+    try {
+      await deleteRegistrationFromFirestore(id);
+    } catch (err) {
+      console.error('Failed to delete registration from Firestore:', err);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-emerald-500 selection:text-white font-tajawal">
       
@@ -243,11 +282,11 @@ export default function App() {
               syncCoursesWithFirestore(updated, prev);
             }}
             onUpdateRegistrations={(updated) => {
-              const prev = registrations;
               setRegistrations(updated);
               saveRegistrations(updated);
-              syncRegistrationsWithFirestore(updated, prev);
+              syncRegistrationsWithFirestore(updated);
             }}
+            onDeleteRegistration={handleDeleteRegistration}
             onUpdateSettings={(updated) => {
               setSettings(updated);
               saveSettings(updated);

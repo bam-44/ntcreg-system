@@ -54,16 +54,10 @@ export function getStoredRegistrations(): TraineeRegistration[] {
   try {
     const data = localStorage.getItem(STORAGE_KEYS.REGISTRATIONS);
     if (!data) {
-      localStorage.setItem(STORAGE_KEYS.REGISTRATIONS, JSON.stringify([]));
       return [];
     }
     const parsed: TraineeRegistration[] = JSON.parse(data);
-    const filtered = parsed.filter(r => !r.id.startsWith('REG-2026-80'));
-    if (filtered.length !== parsed.length) {
-      localStorage.setItem(STORAGE_KEYS.REGISTRATIONS, JSON.stringify(filtered));
-      return filtered;
-    }
-    return parsed;
+    return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     console.error('Error loading registrations:', err);
     return [];

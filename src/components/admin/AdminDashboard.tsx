@@ -18,6 +18,7 @@ interface AdminDashboardProps {
   settings: SystemSettings;
   onUpdateCourses: (courses: Course[]) => void;
   onUpdateRegistrations: (registrations: TraineeRegistration[]) => void;
+  onDeleteRegistration?: (id: string) => void;
   onUpdateSettings: (settings: SystemSettings) => void;
   onLogout: () => void;
   onBackToPublic: () => void;
@@ -29,6 +30,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   settings,
   onUpdateCourses,
   onUpdateRegistrations,
+  onDeleteRegistration,
   onUpdateSettings,
   onLogout,
   onBackToPublic,
@@ -585,6 +587,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             registrations={registrations}
             courses={courses}
             onUpdateRegistrations={onUpdateRegistrations}
+            onDeleteRegistration={onDeleteRegistration}
           />
         </div>
       )}

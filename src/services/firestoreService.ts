@@ -228,21 +228,16 @@ export async function syncCoursesWithFirestore(
 }
 
 /**
- * Sync registrations changes (updated status, deleted) with Firestore
+ * Sync registrations changes (updated status or details) with Firestore
+ * Note: Never automatically delete registrations here to prevent accidental data loss.
+ * Explicit deletion must only occur via deleteRegistrationFromFirestore.
  */
 export async function syncRegistrationsWithFirestore(
-  updatedRegs: TraineeRegistration[], 
-  previousRegs: TraineeRegistration[]
+  updatedRegs: TraineeRegistration[]
 ): Promise<void> {
   try {
     for (const r of updatedRegs) {
       await saveRegistrationToFirestore(r);
-    }
-    const updatedIds = new Set(updatedRegs.map(r => r.id));
-    for (const old of previousRegs) {
-      if (!updatedIds.has(old.id)) {
-        await deleteRegistrationFromFirestore(old.id);
-      }
     }
   } catch (err) {
     console.error('Error syncing registrations with Firestore:', err);

@@ -12,12 +12,14 @@ interface TraineeTableProps {
   registrations: TraineeRegistration[];
   courses: Course[];
   onUpdateRegistrations: (updated: TraineeRegistration[]) => void;
+  onDeleteRegistration?: (id: string) => void;
 }
 
 export const TraineeTable: React.FC<TraineeTableProps> = ({
   registrations,
   courses,
   onUpdateRegistrations,
+  onDeleteRegistration,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCourseId, setSelectedCourseId] = useState<string>('all');
@@ -85,9 +87,13 @@ export const TraineeTable: React.FC<TraineeTableProps> = ({
   // Handle delete
   const handleDelete = (id: string, name: string) => {
     if (window.confirm(`هل أنت متأكد من حذف تسجيل المتدرب "${name}"؟`)) {
-      const updated = registrations.filter((r) => r.id !== id);
-      onUpdateRegistrations(updated);
-      saveRegistrations(updated);
+      if (onDeleteRegistration) {
+        onDeleteRegistration(id);
+      } else {
+        const updated = registrations.filter((r) => r.id !== id);
+        onUpdateRegistrations(updated);
+        saveRegistrations(updated);
+      }
     }
   };
 
