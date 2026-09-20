@@ -92,6 +92,12 @@ export function getStoredSettings(): SystemSettings {
       parsed.contactWhatsApp = INITIAL_SETTINGS.contactWhatsApp;
       parsed.contactPhone = INITIAL_SETTINGS.contactPhone;
     }
+    if (!parsed.contactPhone2) {
+      parsed.contactPhone2 = INITIAL_SETTINGS.contactPhone2;
+    }
+    if (!parsed.contactWhatsApp2) {
+      parsed.contactWhatsApp2 = INITIAL_SETTINGS.contactWhatsApp2;
+    }
     // Strictly enforce authorized admin email
     parsed.adminEmail = AUTHORIZED_ADMIN_EMAIL;
     return { ...INITIAL_SETTINGS, ...parsed };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { CheckCircle, Copy, Check, MessageSquare, Printer, ArrowRight, User, Phone, BookOpen } from 'lucide-react';
+import { CheckCircle, Copy, Check, Printer, ArrowRight, User, Phone, BookOpen } from 'lucide-react';
 import { TraineeRegistration, Course, SystemSettings } from '../../types';
+import { WhatsAppIcon } from '../WhatsAppIcon';
 
 interface RegistrationSuccessModalProps {
   registration: TraineeRegistration;
@@ -118,17 +119,42 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
             </div>
           </div>
 
-          {/* Quick WhatsApp Confirmation Button */}
-          <a
-            href={`https://wa.me/${settings.contactWhatsApp}?text=${whatsappMessage}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            id="btn-whatsapp-confirm"
-            className="w-full py-3.5 px-5 bg-[#25D366] hover:bg-[#20ba5a] active:bg-[#1da851] text-white font-black text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2.5"
-          >
-            <MessageSquare className="w-5 h-5 fill-white/20" />
-            <span>تأكيد الحضور فوراً عبر واتساب المركز</span>
-          </a>
+          {/* WhatsApp Confirmation */}
+          <div className="space-y-2">
+            <a
+              href={`https://wa.me/${settings.contactWhatsApp || '249123156073'}?text=${whatsappMessage}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              id="btn-whatsapp-confirm"
+              className="w-full py-3 px-4 bg-[#25D366] hover:bg-[#20ba5a] active:bg-[#1da851] text-white font-black text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2"
+            >
+              <WhatsAppIcon className="w-4 h-4 text-white" />
+              <span>تأكيد الحضور عبر واتساب ({settings.contactPhone})</span>
+            </a>
+
+            {/* Direct Calling for Inquiries (Both Numbers) */}
+            <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs flex flex-col sm:flex-row items-center justify-between gap-1.5 text-slate-600">
+              <span className="flex items-center gap-1 font-bold text-slate-700">
+                <Phone className="w-3.5 h-3.5 text-[#ec6226]" />
+                <span>للاستفسار والاتصال المباشر:</span>
+              </span>
+              <div className="flex items-center gap-2 font-mono font-bold text-[#185d89]" dir="ltr">
+                <a
+                  href={`tel:${settings.contactPhone.replace(/\s+/g, '')}`}
+                  className="hover:underline hover:text-[#ec6226] transition-colors"
+                >
+                  {settings.contactPhone}
+                </a>
+                <span className="text-slate-300">|</span>
+                <a
+                  href={`tel:${(settings.contactPhone2 || '+249 12 306 1996').replace(/\s+/g, '')}`}
+                  className="hover:underline hover:text-[#ec6226] transition-colors"
+                >
+                  {settings.contactPhone2 || '+249 12 306 1996'}
+                </a>
+              </div>
+            </div>
+          </div>
 
           {/* Secondary Actions: Print & Close */}
           <div className="flex items-center gap-3">

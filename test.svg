@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" fill="none">
+  <!-- 1. Graduation Cap (Academic Blue #196395) -->
+  <g id="cap">
+    <!-- Skullcap Base (drawn first) -->
+    <path 
+      d="M 128,88 L 128,158 C 128,158 160,134 200,134 C 240,134 262,158 262,158 L 262,88 Z" 
+      fill="#196395" 
+    />
+    <!-- Diamond Top -->
+    <polygon 
+      points="200,16 322,76 200,106 68,76" 
+      fill="#196395" 
+    />
+    <!-- Cap Button (White Circle) -->
+    <circle cx="91" cy="77" r="3.5" fill="#ffffff" />
+    <!-- Tassel String -->
+    <path d="M 91,80 L 91,138" stroke="#196395" stroke-width="2.5" stroke-linecap="round" />
+    <!-- Tassel Brush (#f5ab16) -->
+    <path 
+      d="M 91,138 C 87,138 84,142 84,147 C 84,154 87,159 86,163 C 89,161 93,158 94,153 C 95,148 94,138 91,138 Z" 
+      fill="#f5ab16" 
+    />
+  </g>
+
+  <!-- 2. Radiating Golden Yellow Rays (#f5ab16) -->
+  <g id="rays" stroke="#f5ab16" stroke-width="4.5" stroke-linecap="round">
+    <!-- Left Rays -->
+    <line x1="88" y1="152" x2="28" y2="126" />
+    <line x1="78" y1="222" x2="9" y2="222" stroke-width="5" />
+    <line x1="88" y1="290" x2="28" y2="314" />
+
+    <!-- Right Rays -->
+    <line x1="302" y1="152" x2="368" y2="126" />
+    <line x1="318" y1="222" x2="391" y2="222" stroke-width="5" />
+    <line x1="308" y1="290" x2="368" y2="314" />
+  </g>
+
+  <!-- 3. Stylized 'N' Bulb Filament (#ec6226) -->
+  <g id="filament">
+    <path 
+      d="M 130,268 C 108,245 106,196 126,182 C 136,174 148,174 158,184 L 246,252 C 256,260 264,256 266,242 L 266,175" 
+      stroke="#ec6226" 
+      stroke-width="24" 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+      fill="none" 
+    />
+  </g>
+
+  <!-- 4. Bulb Base & Socket (Orange #ec6226 & Blue #196395) -->
+  <g id="base">
+    <!-- Neck stroke connected to top thread ring -->
+    <path 
+      d="M 142,286 L 166,306 L 170,332 L 228,332" 
+      stroke="#ec6226" 
+      stroke-width="12" 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+      fill="none" 
+    />
+    <!-- 2 Lower Horizontal Orange Thread Rings -->
+    <rect x="172" y="346" width="56" height="10" rx="5" fill="#ec6226" />
+    <rect x="177" y="362" width="46" height="10" rx="5" fill="#ec6226" />
+    <!-- Bottom Blue Contact Terminal -->
+    <rect x="185" y="378" width="30" height="9" rx="4.5" fill="#196395" />
+  </g>
+</svg>

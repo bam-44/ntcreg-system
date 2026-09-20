@@ -56,7 +56,9 @@ export interface SystemSettings {
   centerName: string;
   centerSubtitle: string;
   contactPhone: string;
+  contactPhone2?: string;
   contactWhatsApp: string;
+  contactWhatsApp2?: string;
   contactEmail: string;
   currentMonth: string; // "2026-08"
   currentMonthName: string; // "أغسطس 2026"

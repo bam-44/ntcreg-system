@@ -9,6 +9,7 @@ import { Course, TraineeRegistration, SystemSettings, CourseStatus } from '../..
 import { TraineeTable } from './TraineeTable';
 import { CourseFormModal } from './CourseFormModal';
 import { MonthManagerModal } from './MonthManagerModal';
+import { NahdaLogoIcon } from '../Logo';
 import { saveCourses, saveSettings, resetDataToDefaults } from '../../utils/storage';
 import { getArabicMonthLabel } from '../../data/initialData';
 
@@ -46,6 +47,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [centerName, setCenterName] = useState(settings.centerName);
   const [contactWhatsApp, setContactWhatsApp] = useState(settings.contactWhatsApp);
   const [contactPhone, setContactPhone] = useState(settings.contactPhone);
+  const [contactWhatsApp2, setContactWhatsApp2] = useState(settings.contactWhatsApp2 || '249123061996');
+  const [contactPhone2, setContactPhone2] = useState(settings.contactPhone2 || '+249 12 306 1996');
   const [contactEmail, setContactEmail] = useState(settings.contactEmail);
   const [welcomeNotice, setWelcomeNotice] = useState(settings.welcomeNotice);
   const [adminPin, setAdminPin] = useState(settings.adminPin);
@@ -58,6 +61,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setCenterName(settings.centerName);
     setContactWhatsApp(settings.contactWhatsApp);
     setContactPhone(settings.contactPhone);
+    setContactWhatsApp2(settings.contactWhatsApp2 || '249123061996');
+    setContactPhone2(settings.contactPhone2 || '+249 12 306 1996');
     setContactEmail(settings.contactEmail);
     setWelcomeNotice(settings.welcomeNotice);
     setAdminPin(settings.adminPin);
@@ -168,6 +173,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       centerName,
       contactWhatsApp,
       contactPhone,
+      contactWhatsApp2,
+      contactPhone2,
       contactEmail,
       welcomeNotice,
       adminPin: cleanPin,
@@ -658,10 +665,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="text-center p-1">
-                        <span className="text-[10px] text-slate-400 font-bold block leading-tight">بدون صورة</span>
-                        <span className="text-[9px] text-[#185d89] font-bold block mt-0.5">(عرض النص فقط)</span>
-                      </div>
+                      <NahdaLogoIcon className="w-16 h-16 object-contain drop-shadow-xs" />
                     )}
                   </div>
 
@@ -707,29 +711,58 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">رقم الواتساب لاستقبال التأكيدات والتواصل</label>
-                  <input
-                    type="text"
-                    dir="ltr"
-                    value={contactWhatsApp}
-                    onChange={(e) => setContactWhatsApp(e.target.value)}
-                    placeholder=""
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono text-left focus:border-emerald-500"
-                  />
-                  <span className="text-[10px] text-slate-400">بدون + أو مسافات</span>
-                </div>
+              {/* Contact Numbers Section */}
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                <span className="block text-xs font-black text-slate-800 mb-2.5 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  رقم الواتساب والاتصال الرئيسي
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 text-xs mb-1">رقم الواتساب (المحادثات والتأكيدات)</label>
+                    <input
+                      type="text"
+                      dir="ltr"
+                      value={contactWhatsApp}
+                      onChange={(e) => setContactWhatsApp(e.target.value)}
+                      placeholder="249123156073"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-mono text-left focus:border-emerald-500"
+                    />
+                    <span className="text-[10px] text-slate-400">مثال: 249123156073 (لروابط الواتساب بدون + أو مسافات)</span>
+                  </div>
 
+                  <div>
+                    <label className="block font-bold text-slate-700 text-xs mb-1">رقم الهاتف (للاتصال المباشر)</label>
+                    <input
+                      type="text"
+                      dir="ltr"
+                      value={contactPhone}
+                      onChange={(e) => setContactPhone(e.target.value)}
+                      placeholder="+249 12 315 6073"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-mono text-left focus:border-emerald-500"
+                    />
+                    <span className="text-[10px] text-slate-400">الشكل المعروض: +249 12 315 6073</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Phone Number */}
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                <span className="block text-xs font-black text-slate-800 mb-2.5 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#ec6226]" />
+                  رقم هاتف إضافي (للاتصال المباشر)
+                </span>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">رقم الهاتف العام</label>
+                  <label className="block font-bold text-slate-700 text-xs mb-1">رقم الهاتف الإضافي</label>
                   <input
                     type="text"
                     dir="ltr"
-                    value={contactPhone}
-                    onChange={(e) => setContactPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono text-left focus:border-emerald-500"
+                    value={contactPhone2}
+                    onChange={(e) => setContactPhone2(e.target.value)}
+                    placeholder="+249 12 306 1996"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-mono text-left focus:border-emerald-500 max-w-md"
                   />
+                  <span className="text-[10px] text-slate-400">يظهر في قائمة الاتصال المباشر بالموقع</span>
                 </div>
               </div>
 
