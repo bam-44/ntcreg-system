@@ -25,6 +25,9 @@ import {
   seedInitialFirestoreData,
   onAdminAuthStateChange,
   signOutFirebaseUser,
+  fetchCoursesFromFirestore,
+  fetchRegistrationsFromFirestore,
+  fetchSettingsFromFirestore,
 } from './services/firestoreService';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -71,6 +74,34 @@ export default function App() {
     if (!adminAuth) {
       setActiveView('public');
     }
+
+    // Initial direct fetch from Firestore to guarantee immediate multi-device sync
+    const syncFreshFromCloud = async () => {
+      try {
+        const [cloudCourses, cloudRegs, cloudSettings] = await Promise.all([
+          fetchCoursesFromFirestore(),
+          fetchRegistrationsFromFirestore(),
+          fetchSettingsFromFirestore(),
+        ]);
+
+        if (cloudCourses && cloudCourses.length > 0) {
+          setCourses(cloudCourses);
+          saveCourses(cloudCourses);
+        }
+        if (cloudRegs && cloudRegs.length > 0) {
+          setRegistrations(cloudRegs);
+          saveRegistrations(cloudRegs);
+        }
+        if (cloudSettings && cloudSettings.centerName) {
+          setSettings(cloudSettings);
+          saveSettings(cloudSettings);
+        }
+      } catch (err) {
+        console.warn('Initial cloud sync notice:', err);
+      }
+    };
+
+    syncFreshFromCloud();
 
     // Real-time Firestore Subscriptions
     const unsubCourses = subscribeToCourses((firestoreCourses) => {
@@ -241,6 +272,33 @@ export default function App() {
     }
   };
 
+  // Handler for manual cloud sync trigger
+  const handleRefreshFromCloud = async (): Promise<void> => {
+    try {
+      const [cloudCourses, cloudRegs, cloudSettings] = await Promise.all([
+        fetchCoursesFromFirestore(),
+        fetchRegistrationsFromFirestore(),
+        fetchSettingsFromFirestore(),
+      ]);
+
+      if (cloudCourses && cloudCourses.length > 0) {
+        setCourses(cloudCourses);
+        saveCourses(cloudCourses);
+      }
+      if (cloudRegs) {
+        setRegistrations(cloudRegs);
+        saveRegistrations(cloudRegs);
+      }
+      if (cloudSettings && cloudSettings.centerName) {
+        setSettings(cloudSettings);
+        saveSettings(cloudSettings);
+      }
+    } catch (err) {
+      console.error('Manual cloud sync error:', err);
+      throw err;
+    }
+  };
+
   // Handler for explicitly deleting a registration
   const handleDeleteRegistration = async (id: string) => {
     const updated = registrations.filter((r) => r.id !== id);
@@ -292,6 +350,7 @@ export default function App() {
               saveSettings(updated);
               saveSettingsToFirestore(updated);
             }}
+            onRefreshFromCloud={handleRefreshFromCloud}
             onLogout={handleAdminLogout}
             onBackToPublic={() => setActiveView('public')}
           />

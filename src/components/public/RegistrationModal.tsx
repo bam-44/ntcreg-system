@@ -82,10 +82,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       const res = await onSubmit({
         fullName: fullName.trim(),
         phoneNumber: phoneNumber.trim(),
-        email: email.trim() || undefined,
-        city: city.trim() || undefined,
-        jobTitle: jobTitle.trim() || undefined,
-        notes: notes.trim() || undefined,
+        email: email.trim() || '',
+        city: city.trim() || '',
+        jobTitle: jobTitle.trim() || '',
+        notes: notes.trim() || '',
       });
 
       if (!res.success) {

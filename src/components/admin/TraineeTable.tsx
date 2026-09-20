@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
   Search, Download, Trash2, Edit3, MessageSquare, Phone, Mail, 
   Calendar, CheckCircle, Clock, XCircle, Filter, FileSpreadsheet, 
-  Eye, UserCheck, AlertTriangle 
+  Eye, UserCheck, AlertTriangle, RefreshCw 
 } from 'lucide-react';
 import { TraineeRegistration, Course, RegistrationStatus } from '../../types';
 import { exportRegistrationsToCSV, saveRegistrations } from '../../utils/storage';
@@ -13,6 +13,7 @@ interface TraineeTableProps {
   courses: Course[];
   onUpdateRegistrations: (updated: TraineeRegistration[]) => void;
   onDeleteRegistration?: (id: string) => void;
+  onRefresh?: () => Promise<void>;
 }
 
 export const TraineeTable: React.FC<TraineeTableProps> = ({
@@ -20,12 +21,30 @@ export const TraineeTable: React.FC<TraineeTableProps> = ({
   courses,
   onUpdateRegistrations,
   onDeleteRegistration,
+  onRefresh,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCourseId, setSelectedCourseId] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedTraineeDetails, setSelectedTraineeDetails] = useState<TraineeRegistration | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshSuccess, setRefreshSuccess] = useState<string | null>(null);
+
+  const handleRefreshClick = async () => {
+    if (!onRefresh) return;
+    setIsRefreshing(true);
+    try {
+      await onRefresh();
+      setRefreshSuccess('تم تحديث قائمة المتدربين من السحابة بنجاح!');
+      setTimeout(() => setRefreshSuccess(null), 3500);
+    } catch (err) {
+      setRefreshSuccess('تعذر التحديث حالياً، تحقق من الاتصال بالإنترنت.');
+      setTimeout(() => setRefreshSuccess(null), 3500);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // Month options
   const monthOptions = useMemo(() => {
@@ -151,8 +170,26 @@ export const TraineeTable: React.FC<TraineeTableProps> = ({
             <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
           </div>
 
-          {/* Export Buttons */}
+          {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-end">
+            {onRefresh && (
+              <button
+                id="btn-trainees-cloud-sync"
+                type="button"
+                onClick={handleRefreshClick}
+                disabled={isRefreshing}
+                className={`px-3.5 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
+                  isRefreshing
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300 animate-pulse cursor-wait'
+                    : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300 shadow-2xs'
+                }`}
+                title="مزامنة وتحديث قائمة المتدربين مباشرة من السحابة"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>{isRefreshing ? 'جارِ التحميل...' : 'تحديث القائمة الآن'}</span>
+              </button>
+            )}
+
             <button
               id="btn-export-excel-csv"
               onClick={handleExportCSV}
@@ -163,6 +200,13 @@ export const TraineeTable: React.FC<TraineeTableProps> = ({
             </button>
           </div>
         </div>
+
+        {refreshSuccess && (
+          <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-3.5 py-2 rounded-xl flex items-center gap-2 font-bold animate-fadeIn">
+            <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{refreshSuccess}</span>
+          </div>
+        )}
 
         {/* Dropdown Filters */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100 text-xs">

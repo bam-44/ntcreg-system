@@ -200,7 +200,7 @@ export function registerTrainee(
     id,
     fullName: data.fullName.trim(),
     phoneNumber: cleanPhone,
-    email: data.email?.trim(),
+    email: data.email?.trim() || '',
     courseId: course.id,
     courseTitle: course.title,
     courseMonth: course.month,

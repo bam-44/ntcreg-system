@@ -21,6 +21,7 @@ interface AdminDashboardProps {
   onUpdateRegistrations: (registrations: TraineeRegistration[]) => void;
   onDeleteRegistration?: (id: string) => void;
   onUpdateSettings: (settings: SystemSettings) => void;
+  onRefreshFromCloud?: () => Promise<void>;
   onLogout: () => void;
   onBackToPublic: () => void;
 }
@@ -33,6 +34,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onUpdateRegistrations,
   onDeleteRegistration,
   onUpdateSettings,
+  onRefreshFromCloud,
   onLogout,
   onBackToPublic,
 }) => {
@@ -42,6 +44,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [isMonthModalOpen, setIsMonthModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [syncToast, setSyncToast] = useState<string | null>(null);
+
+  const handleRefreshCloud = async () => {
+    if (!onRefreshFromCloud) return;
+    setIsRefreshing(true);
+    try {
+      await onRefreshFromCloud();
+      setSyncToast('تمت مزامنة جميع البيانات مباشرة من قاعدة البيانات السحابية!');
+      setTimeout(() => setSyncToast(null), 4000);
+    } catch (e) {
+      setSyncToast('تعذر الاتصال بالسحابة حالياً، تأكد من الاتصال بالإنترنت.');
+      setTimeout(() => setSyncToast(null), 4000);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // Settings local state
   const [centerName, setCenterName] = useState(settings.centerName);
@@ -233,6 +252,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Quick action buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {onRefreshFromCloud && (
+            <button
+              id="btn-admin-sync-cloud"
+              onClick={handleRefreshCloud}
+              disabled={isRefreshing}
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 shadow-xs ${
+                isRefreshing
+                  ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/40 animate-pulse cursor-wait'
+                  : 'bg-emerald-600/90 hover:bg-emerald-600 active:bg-emerald-700 text-white border-emerald-400/30'
+              }`}
+              title="تحديث البيانات فورا من قاعدة البيانات السحابية"
+            >
+              <RefreshCw className={`w-4 h-4 text-emerald-300 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>{isRefreshing ? 'جارِ المزامنة...' : 'تحديث من السحابة'}</span>
+            </button>
+          )}
+
           <button
             id="btn-admin-add-course"
             onClick={handleOpenAddCourse}
@@ -270,6 +306,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
         </div>
       </div>
+
+      {syncToast && (
+        <div className="bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs px-4 py-3 rounded-2xl flex items-center gap-2.5 font-bold shadow-xs animate-fadeIn">
+          <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+          <span>{syncToast}</span>
+        </div>
+      )}
 
       {/* Tabs Navigation */}
       <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
@@ -612,6 +655,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             courses={courses}
             onUpdateRegistrations={onUpdateRegistrations}
             onDeleteRegistration={onDeleteRegistration}
+            onRefresh={handleRefreshCloud}
           />
         </div>
       )}

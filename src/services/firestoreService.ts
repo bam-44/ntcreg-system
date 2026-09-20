@@ -25,6 +25,79 @@ const REGISTRATIONS_COLLECTION = 'registrations';
 const SETTINGS_DOC = 'settings';
 
 /**
+ * Sanitizes an object recursively to ensure no `undefined` values exist,
+ * as Firestore strictly rejects any document containing `undefined`.
+ */
+export function cleanFirestoreData<T extends Record<string, any>>(data: T): T {
+  if (!data || typeof data !== 'object') return data;
+  const result: any = Array.isArray(data) ? [] : {};
+  for (const [key, val] of Object.entries(data)) {
+    if (val === undefined) {
+      result[key] = '';
+    } else if (val !== null && typeof val === 'object' && !(val instanceof Date)) {
+      result[key] = cleanFirestoreData(val);
+    } else {
+      result[key] = val;
+    }
+  }
+  return result as T;
+}
+
+/**
+ * Directly fetch all courses from Firestore
+ */
+export async function fetchCoursesFromFirestore(): Promise<Course[]> {
+  try {
+    const coursesRef = collection(db, COURSES_COLLECTION);
+    const snap = await getDocs(coursesRef);
+    const items: Course[] = [];
+    snap.forEach((docSnap) => {
+      items.push(docSnap.data() as Course);
+    });
+    return items;
+  } catch (err) {
+    console.error('Failed to fetch courses from Firestore:', err);
+    return [];
+  }
+}
+
+/**
+ * Directly fetch all trainee registrations from Firestore
+ */
+export async function fetchRegistrationsFromFirestore(): Promise<TraineeRegistration[]> {
+  try {
+    const regRef = collection(db, REGISTRATIONS_COLLECTION);
+    const snap = await getDocs(regRef);
+    const items: TraineeRegistration[] = [];
+    snap.forEach((docSnap) => {
+      items.push(docSnap.data() as TraineeRegistration);
+    });
+    items.sort((a, b) => new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime());
+    return items;
+  } catch (err) {
+    console.error('Failed to fetch registrations from Firestore:', err);
+    return [];
+  }
+}
+
+/**
+ * Directly fetch system settings from Firestore
+ */
+export async function fetchSettingsFromFirestore(): Promise<SystemSettings | null> {
+  try {
+    const settingsRef = doc(db, SETTINGS_DOC, 'general');
+    const docSnap = await getDoc(settingsRef);
+    if (docSnap.exists()) {
+      return docSnap.data() as SystemSettings;
+    }
+    return null;
+  } catch (err) {
+    console.error('Failed to fetch settings from Firestore:', err);
+    return null;
+  }
+}
+
+/**
  * Real-time subscription to Courses in Firestore
  */
 export function subscribeToCourses(
@@ -60,7 +133,8 @@ export function subscribeToCourses(
 export async function saveCourseToFirestore(course: Course): Promise<void> {
   try {
     const courseRef = doc(db, COURSES_COLLECTION, course.id);
-    await setDoc(courseRef, course, { merge: true });
+    const cleaned = cleanFirestoreData(course);
+    await setDoc(courseRef, cleaned, { merge: true });
   } catch (err) {
     console.error('Failed to save course to Firestore:', err);
     throw err;
@@ -89,31 +163,28 @@ export function subscribeToRegistrations(
 ): () => void {
   try {
     const regRef = collection(db, REGISTRATIONS_COLLECTION);
-    const q = query(regRef, orderBy('registeredAt', 'desc'));
+    let fallbackUnsub: (() => void) | null = null;
     
-    const unsubscribe = onSnapshot(
-      q,
+    const primaryUnsubscribe = onSnapshot(
+      regRef,
       (snapshot) => {
         const items: TraineeRegistration[] = [];
         snapshot.forEach((docSnap) => {
           items.push(docSnap.data() as TraineeRegistration);
         });
+        items.sort((a, b) => new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime());
         onUpdate(items);
       },
       (error) => {
-        // Fallback without order if index is building
-        console.warn('Retrying registrations subscription without order:', error);
-        onSnapshot(regRef, (snapshot) => {
-          const fallbackItems: TraineeRegistration[] = [];
-          snapshot.forEach((docSnap) => {
-            fallbackItems.push(docSnap.data() as TraineeRegistration);
-          });
-          fallbackItems.sort((a, b) => new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime());
-          onUpdate(fallbackItems);
-        }, onError);
+        console.warn('Registrations subscription notice:', error);
+        if (onError) onError(error);
       }
     );
-    return unsubscribe;
+
+    return () => {
+      primaryUnsubscribe();
+      if (fallbackUnsub) fallbackUnsub();
+    };
   } catch (err) {
     console.warn('Could not subscribe to Firestore registrations:', err);
     return () => {};
@@ -126,7 +197,8 @@ export function subscribeToRegistrations(
 export async function saveRegistrationToFirestore(registration: TraineeRegistration): Promise<void> {
   try {
     const regRef = doc(db, REGISTRATIONS_COLLECTION, registration.id);
-    await setDoc(regRef, registration);
+    const cleaned = cleanFirestoreData(registration);
+    await setDoc(regRef, cleaned, { merge: true });
   } catch (err) {
     console.error('Failed to save registration to Firestore:', err);
     throw err;
@@ -142,7 +214,8 @@ export async function updateRegistrationInFirestore(
 ): Promise<void> {
   try {
     const regRef = doc(db, REGISTRATIONS_COLLECTION, registrationId);
-    await updateDoc(regRef, updates);
+    const cleaned = cleanFirestoreData(updates);
+    await updateDoc(regRef, cleaned);
   } catch (err) {
     console.error('Failed to update registration in Firestore:', err);
     throw err;
@@ -196,7 +269,8 @@ export function subscribeToSettings(
 export async function saveSettingsToFirestore(settings: SystemSettings): Promise<void> {
   try {
     const settingsRef = doc(db, SETTINGS_DOC, 'general');
-    await setDoc(settingsRef, settings, { merge: true });
+    const cleaned = cleanFirestoreData(settings);
+    await setDoc(settingsRef, cleaned, { merge: true });
   } catch (err) {
     console.error('Failed to save settings to Firestore:', err);
     throw err;
